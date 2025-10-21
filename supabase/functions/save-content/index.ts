@@ -1,7 +1,7 @@
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Client-Info, Apikey",
 };
 
 Deno.serve(async (req: Request) => {
@@ -119,16 +119,15 @@ Deno.serve(async (req: Request) => {
       try {
         console.log(`Attempting to save to database (attempt ${attempt}/${maxRetries})`);
         
-        supabaseResponse = await fetch(`${supabaseUrl}/rest/v1/site_content`, {
+        supabaseResponse = await fetch(`${supabaseUrl}/rest/v1/user_content`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${supabaseServiceKey}`,
             'apikey': supabaseServiceKey,
-            'Prefer': 'resolution=merge-duplicates'
+            'Prefer': 'return=minimal'
           },
           body: JSON.stringify({
-            id: 'main',
             content: content,
             updated_at: new Date().toISOString()
           })

@@ -351,27 +351,9 @@ function App() {
         console.error('Error loading latest content:', error);
       }
     };
-    
+
     loadLatestContent();
   }, []);
-  
-  // Периодически проверяем обновления контента (каждые 30 секунд)
-  useEffect(() => {
-    const interval = setInterval(async () => {
-      try {
-        const latestContent = await loadContent();
-        // Сравниваем с текущим контентом и обновляем если есть изменения
-        if (JSON.stringify(latestContent) !== JSON.stringify(content)) {
-          console.log('Content updated from database');
-          setContent(latestContent);
-        }
-      } catch (error) {
-        console.error('Error checking for content updates:', error);
-      }
-    }, 30000); // 30 секунд
-    
-    return () => clearInterval(interval);
-  }, [content]);
   
   // Save content to localStorage when it changes
   useEffect(() => {
