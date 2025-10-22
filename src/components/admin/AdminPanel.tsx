@@ -602,7 +602,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose, content, onCon
           {activeTab === 'blocks' && (
             <div className="flex-1 flex">
               {/* Blocks List */}
-              <div className="w-1/3 border-r border-gray-700 overflow-y-auto">
+              <div className="w-1/3 min-w-[300px] max-w-[400px] border-r border-gray-700 overflow-y-auto flex-shrink-0">
                 <div className="p-4">
                   <button
                     onClick={createNewBlock}
@@ -716,7 +716,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose, content, onCon
               </div>
 
               {/* Block Editor */}
-              <div className="flex-1 overflow-y-auto">
+              <div className="flex-1 min-w-0 overflow-y-auto">
                 {editingBlock ? (
                   <div className="p-6">
                     <div className="mb-6">
