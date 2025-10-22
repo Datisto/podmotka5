@@ -792,7 +792,7 @@ function App() {
                     <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 to-cyan-600/20 rounded-3xl blur-3xl transform rotate-6"></div>
                     <div className="relative z-10">
                       <img
-                        src="https://i.ibb.co/Fkyfsw7V/image.png"
+                        src="https://i.ibb.co/fd1GsKM9/Image48.png"
                         alt="CAN Module"
                         className="w-full max-w-md h-auto object-contain transform hover:scale-105 transition-transform duration-500"
                       />
