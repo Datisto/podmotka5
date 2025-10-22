@@ -94,7 +94,7 @@ export const defaultContent: SiteContent = {
       images: [
         {
           id: 'can-1',
-          url: 'https://i.ibb.co/Fkyfsw7V/image.png',
+          url: 'https://i.ibb.co/fd1GsKM9/Image48.png',
           alt: 'CAN Module'
         }
       ],
