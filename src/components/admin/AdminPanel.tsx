@@ -89,7 +89,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose, content, onCon
     'https://images.pexels.com/photos/2244746/pexels-photo-2244746.jpeg?auto=compress&cs=tinysrgb&w=800',
     'https://images.pexels.com/photos/1170412/pexels-photo-1170412.jpeg?auto=compress&cs=tinysrgb&w=800',
     'https://i.ibb.co/fd1GsKM9/Image48.png',
-    'https://i.ibb.co/BHNJB1ZG/product-image-of-Ana.png'
+    'https://i.ibb.co/RpsctJ1f/Chat-GPT-Image-10-2025-21-09-31.png'
   ];
 
   const icons = ['⚙️', '🔧', '🛠️', '📱', '💻', '🚗', '🔌', '📊', '🎯', '⭐', '🔥', '💡'];
