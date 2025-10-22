@@ -1,0 +1,22 @@
+# Robots.txt для підмотки спідометра
+User-agent: *
+Allow: /
+
+# Дозволити всім пошуковим системам сканувати сайт
+Disallow: /admin
+Disallow: /api/
+
+# Sitemap
+Sitemap: https://yourdomain.com/sitemap.xml
+
+# Google Bot
+User-agent: Googlebot
+Allow: /
+
+# Bing Bot
+User-agent: Bingbot
+Allow: /
+
+# Yandex Bot
+User-agent: Yandex
+Allow: /

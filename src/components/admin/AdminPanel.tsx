@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { X, Plus, Trash2, Eye, EyeOff, Save, Upload, Download, RotateCcw, Settings, Palette, Type, Image, Video, Link, ChevronUp, ChevronDown, Edit3, LogOut, AlignLeft, AlignCenter, AlignRight, Bold, Italic, Underline, Database, FileDown, FileUp } from 'lucide-react';
+import { X, Plus, Trash2, Eye, EyeOff, Save, Upload, Download, RotateCcw, Settings, Palette, Type, Image, Video, Link, ChevronUp, ChevronDown, Edit3, LogOut, AlignLeft, AlignCenter, AlignRight, Bold, Italic, Underline, Database, FileDown, FileUp, Globe } from 'lucide-react';
 import { ContentBlock, SiteContent, TextStyle, ContentImage } from '../../types/content';
 import { defaultContent } from '../../data/defaultContent';
 import { logout } from '../../utils/auth';
 import { loadBackgroundsFromDatabase } from '../../utils/supabase';
 import { exportDatabaseBackup, importDatabaseBackup } from '../../utils/contentStorage';
+import { getDefaultSEO } from '../../utils/seo';
 import TextEditor from './TextEditor';
+import SEOEditor from './SEOEditor';
 
 interface AdminPanelProps {
   isOpen: boolean;
@@ -15,7 +17,7 @@ interface AdminPanelProps {
 }
 
 const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose, content, onContentChange }) => {
-  const [activeTab, setActiveTab] = useState<'blocks' | 'navigation'>('blocks');
+  const [activeTab, setActiveTab] = useState<'blocks' | 'navigation' | 'seo'>('blocks');
   const [editingBlock, setEditingBlock] = useState<ContentBlock | null>(null);
   const [draggedBlock, setDraggedBlock] = useState<string | null>(null);
   const [backgroundImages, setBackgroundImages] = useState<Array<{id: string, name: string, css_value: string, preview_color: string}>>([]);
@@ -593,6 +595,17 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose, content, onCon
             }`}
           >
             Навигация
+          </button>
+          <button
+            onClick={() => setActiveTab('seo')}
+            className={`px-6 py-3 font-medium transition-colors flex items-center ${
+              activeTab === 'seo'
+                ? 'text-yellow-400 border-b-2 border-yellow-400'
+                : 'text-gray-400 hover:text-white'
+            }`}
+          >
+            <Globe className="w-4 h-4 mr-2" />
+            SEO
           </button>
         </div>
 
@@ -1661,6 +1674,22 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose, content, onCon
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* SEO Tab */}
+          {activeTab === 'seo' && (
+            <div className="flex-1 p-6 overflow-y-auto">
+              <SEOEditor
+                seo={content.seo || getDefaultSEO()}
+                onSave={(newSeo) => {
+                  const updatedContent = {
+                    ...content,
+                    seo: newSeo
+                  };
+                  onContentChange(updatedContent);
+                }}
+              />
             </div>
           )}
         </div>

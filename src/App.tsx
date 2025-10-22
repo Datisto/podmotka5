@@ -6,6 +6,7 @@ import DynamicContent from './components/DynamicContent';
 import { SiteContent } from './types/content';
 import { loadContentSync, saveContent, loadContent } from './utils/contentStorage';
 import { checkAdminSession } from './utils/auth';
+import { updateMetaTags, generateStructuredData, getDefaultSEO } from './utils/seo';
 
 interface AnimatedSectionProps {
   children: React.ReactNode;
@@ -354,6 +355,13 @@ function App() {
 
     loadLatestContent();
   }, []);
+
+  // Update meta tags when content changes
+  useEffect(() => {
+    const seoSettings = content.seo || getDefaultSEO();
+    updateMetaTags(seoSettings);
+    generateStructuredData(seoSettings);
+  }, [content]);
   
   // Save content to localStorage when it changes
   useEffect(() => {

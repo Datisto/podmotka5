@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Головна сторінка -->
+  <url>
+    <loc>https://yourdomain.com/</loc>
+    <lastmod>2025-10-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- CAN модуль -->
+  <url>
+    <loc>https://yourdomain.com/#can-module</loc>
+    <lastmod>2025-10-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Аналоговий модуль -->
+  <url>
+    <loc>https://yourdomain.com/#analog-module</loc>
+    <lastmod>2025-10-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- OPS емулятор -->
+  <url>
+    <loc>https://yourdomain.com/#ops-module</loc>
+    <lastmod>2025-10-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Відео огляди -->
+  <url>
+    <loc>https://yourdomain.com/#videos</loc>
+    <lastmod>2025-10-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Контакти -->
+  <url>
+    <loc>https://yourdomain.com/#contacts</loc>
+    <lastmod>2025-10-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+</urlset>
