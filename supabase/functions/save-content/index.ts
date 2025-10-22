@@ -125,9 +125,10 @@ Deno.serve(async (req: Request) => {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${supabaseServiceKey}`,
             'apikey': supabaseServiceKey,
-            'Prefer': 'return=minimal'
+            'Prefer': 'resolution=merge-duplicates,return=minimal'
           },
           body: JSON.stringify({
+            id: 'main-content',
             content: content,
             updated_at: new Date().toISOString()
           })

@@ -3,6 +3,7 @@ import { defaultContent } from '../data/defaultContent';
 import { supabase } from './supabase';
 
 const CONTENT_STORAGE_KEY = 'site_content';
+const MAIN_CONTENT_ID = 'main-content';
 
 export const loadContentSync = (): SiteContent => {
   try {
@@ -34,8 +35,7 @@ export const loadContent = async (): Promise<SiteContent> => {
     const { data, error } = await supabase
       .from('user_content')
       .select('content')
-      .order('created_at', { ascending: false })
-      .limit(1)
+      .eq('id', MAIN_CONTENT_ID)
       .maybeSingle();
 
     if (error) {
@@ -60,9 +60,22 @@ export const loadContent = async (): Promise<SiteContent> => {
   }
 };
 
+let saveContentTimer: NodeJS.Timeout | null = null;
+
 export const saveContent = async (content: SiteContent): Promise<void> => {
   try {
-    localStorage.setItem(CONTENT_STORAGE_KEY, JSON.stringify(content));
+    try {
+      localStorage.setItem(CONTENT_STORAGE_KEY, JSON.stringify(content));
+    } catch (storageError) {
+      console.error('LocalStorage quota exceeded:', storageError);
+      window.dispatchEvent(new CustomEvent('contentSaved', {
+        detail: {
+          success: false,
+          error: 'Storage quota exceeded. Try removing large images.'
+        }
+      }));
+      return;
+    }
 
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
     const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -76,7 +89,14 @@ export const saveContent = async (content: SiteContent): Promise<void> => {
 
     const { error } = await supabase
       .from('user_content')
-      .insert([{ content: content }]);
+      .upsert(
+        {
+          id: MAIN_CONTENT_ID,
+          content: content,
+          updated_at: new Date().toISOString()
+        },
+        { onConflict: 'id' }
+      );
 
     if (error) {
       console.error('Error saving to Supabase:', error);
@@ -94,6 +114,16 @@ export const saveContent = async (content: SiteContent): Promise<void> => {
       detail: { success: false, error: (error as Error).message }
     }));
   }
+};
+
+export const saveContentDebounced = (content: SiteContent): void => {
+  if (saveContentTimer) {
+    clearTimeout(saveContentTimer);
+  }
+
+  saveContentTimer = setTimeout(() => {
+    saveContent(content).catch(console.error);
+  }, 1000);
 };
 
 export const exportDatabaseBackup = async (): Promise<void> => {
