@@ -3,7 +3,6 @@ import { X, Plus, Trash2, Eye, EyeOff, Save, Upload, Download, RotateCcw, Settin
 import { ContentBlock, SiteContent, TextStyle, ContentImage } from '../../types/content';
 import { defaultContent } from '../../data/defaultContent';
 import { logout } from '../../utils/auth';
-import { loadBackgroundsFromDatabase } from '../../utils/supabase';
 import { exportDatabaseBackup, importDatabaseBackup } from '../../utils/contentStorage';
 import { getDefaultSEO } from '../../utils/seo';
 import TextEditor from './TextEditor';
@@ -31,51 +30,46 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose, content, onCon
     rows?: number;
   } | null>(null);
 
-  // Load backgrounds from database on component mount
   useEffect(() => {
-    const loadBackgrounds = async () => {
-      // Используем ваши конкретные градиенты
-      const specificBackgrounds = [
-        { 
-          id: 'teal-gradient', 
-          name: 'Бирюзовый градиент', 
-          css_value: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 40%, #00d4aa 70%, #00a693 100%)', 
-          preview_color: '#00d4aa' 
-        },
-        { 
-          id: 'green-gradient', 
-          name: 'Зеленый градиент', 
-          css_value: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 40%, #00ff88 70%, #00cc66 100%)', 
-          preview_color: '#00ff88' 
-        },
-        { 
-          id: 'orange-gradient', 
-          name: 'Оранжево-коричневый градиент', 
-          css_value: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 40%, #ff6600 70%, #cc4400 100%)', 
-          preview_color: '#ff6600' 
-        },
-        { 
-          id: 'purple-gradient', 
-          name: 'Фиолетовый градиент', 
-          css_value: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 40%, #8b5cf6 70%, #7c3aed 100%)', 
-          preview_color: '#8b5cf6' 
-        },
-        { 
-          id: 'blue-gradient', 
-          name: 'Синий градиент', 
-          css_value: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 40%, #3b82f6 70%, #2563eb 100%)', 
-          preview_color: '#3b82f6' 
-        },
-        { 
-          id: 'red-gradient', 
-          name: 'Красный градиент', 
-          css_value: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 40%, #ef4444 70%, #dc2626 100%)', 
-          preview_color: '#ef4444' 
-        }
-      ];
-      setBackgroundImages(specificBackgrounds);
-    };
-    loadBackgrounds();
+    const specificBackgrounds = [
+      {
+        id: 'teal-gradient',
+        name: 'Бирюзовый градиент',
+        css_value: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 40%, #00d4aa 70%, #00a693 100%)',
+        preview_color: '#00d4aa'
+      },
+      {
+        id: 'green-gradient',
+        name: 'Зеленый градиент',
+        css_value: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 40%, #00ff88 70%, #00cc66 100%)',
+        preview_color: '#00ff88'
+      },
+      {
+        id: 'orange-gradient',
+        name: 'Оранжево-коричневый градиент',
+        css_value: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 40%, #ff6600 70%, #cc4400 100%)',
+        preview_color: '#ff6600'
+      },
+      {
+        id: 'purple-gradient',
+        name: 'Фиолетовый градиент',
+        css_value: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 40%, #8b5cf6 70%, #7c3aed 100%)',
+        preview_color: '#8b5cf6'
+      },
+      {
+        id: 'blue-gradient',
+        name: 'Синий градиент',
+        css_value: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 40%, #3b82f6 70%, #2563eb 100%)',
+        preview_color: '#3b82f6'
+      },
+      {
+        id: 'red-gradient',
+        name: 'Красный градиент',
+        css_value: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 40%, #ef4444 70%, #dc2626 100%)',
+        preview_color: '#ef4444'
+      }
+    ];
+    setBackgroundImages(specificBackgrounds);
   }, []);
 
   const galleryImages = [
@@ -552,10 +546,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose, content, onCon
                     }
 
                     try {
-                      const newContent = await importDatabaseBackup(file);
-                      onContentChange(newContent);
+                      await importDatabaseBackup(file);
                       alert('База даних успішно імпортована! Оновіть сторінку для застосування змін.');
-                      // Перезавантажуємо сторінку для застосування змін
                       setTimeout(() => {
                         window.location.reload();
                       }, 1000);
