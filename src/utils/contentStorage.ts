@@ -32,7 +32,7 @@ export const loadContent = async (): Promise<SiteContent> => {
     }
 
     const { data, error } = await supabase
-      .from('site_content')
+      .from('user_content')
       .select('content')
       .order('created_at', { ascending: false })
       .limit(1)
@@ -75,7 +75,7 @@ export const saveContent = async (content: SiteContent): Promise<void> => {
     }
 
     const { error } = await supabase
-      .from('site_content')
+      .from('user_content')
       .insert([{ content: content }]);
 
     if (error) {
