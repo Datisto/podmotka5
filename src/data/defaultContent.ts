@@ -141,7 +141,7 @@ export const defaultContent: SiteContent = {
       images: [
         {
           id: 'analog-1',
-          url: 'https://i.ibb.co/BHNJB1ZG/product-image-of-Ana.png',
+          url: 'https://i.ibb.co/RpsctJ1f/Chat-GPT-Image-10-2025-21-09-31.png',
           alt: 'Analog Module'
         }
       ],
