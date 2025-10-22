@@ -860,7 +860,7 @@ function App() {
                     <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/20 to-yellow-600/20 rounded-3xl blur-3xl transform rotate-6"></div>
                     <div className="relative z-10">
                       <img
-                        src="https://i.ibb.co/BHNJB1ZG/product-image-of-Ana.png"
+                        src="https://i.ibb.co/RpsctJ1f/Chat-GPT-Image-10-2025-21-09-31.png"
                         alt="Analog Module"
                         className="w-full max-w-md h-auto object-contain transform hover:scale-105 transition-transform duration-500"
                       />
