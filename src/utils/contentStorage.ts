@@ -220,6 +220,92 @@ export const importContent = (jsonString: string): SiteContent => {
   }
 };
 
+// Функція для експорту бази даних (завантаження JSON файлу)
+export const exportDatabaseBackup = async (): Promise<void> => {
+  try {
+    console.log('📦 Створення бекапу бази даних...');
+
+    // Завантажуємо поточний контент з бази даних
+    const dbContent = await loadContentFromDatabase();
+    const contentToExport = dbContent || loadContentSync();
+
+    // Створюємо JSON з форматуванням
+    const jsonString = JSON.stringify(contentToExport, null, 2);
+
+    // Створюємо Blob з JSON даними
+    const blob = new Blob([jsonString], { type: 'application/json' });
+
+    // Створюємо URL для завантаження
+    const url = URL.createObjectURL(blob);
+
+    // Створюємо тимчасове посилання для завантаження
+    const link = document.createElement('a');
+    link.href = url;
+
+    // Генеруємо ім'я файлу з датою
+    const date = new Date().toISOString().split('T')[0];
+    const time = new Date().toTimeString().split(' ')[0].replace(/:/g, '-');
+    link.download = `database-backup-${date}-${time}.json`;
+
+    // Активуємо завантаження
+    document.body.appendChild(link);
+    link.click();
+
+    // Прибираємо посилання
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    console.log('✅ Бекап успішно завантажено');
+  } catch (error) {
+    console.error('❌ Помилка створення бекапу:', error);
+    throw new Error('Не вдалося створити бекап бази даних');
+  }
+};
+
+// Функція для імпорту бази даних (заміна всього контенту)
+export const importDatabaseBackup = async (file: File): Promise<SiteContent> => {
+  try {
+    console.log('📥 Імпорт бази даних з файлу...');
+
+    // Читаємо файл
+    const text = await file.text();
+
+    // Парсимо JSON
+    const content = JSON.parse(text) as SiteContent;
+
+    // Валідуємо структуру
+    if (!content.blocks || !Array.isArray(content.blocks)) {
+      throw new Error('Невірна структура файлу: відсутній масив blocks');
+    }
+
+    if (!content.navigation || !content.navigation.items) {
+      throw new Error('Невірна структура файлу: відсутня навігація');
+    }
+
+    console.log('✅ Файл успішно прочитано та перевірено');
+
+    // Зберігаємо в localStorage
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(content));
+    console.log('💾 Збережено в localStorage');
+
+    // Зберігаємо в базу даних
+    const dbSaved = await saveContentToDatabase(content);
+    if (dbSaved) {
+      console.log('✅ Збережено в базу даних');
+    } else {
+      console.warn('⚠️ Не вдалося зберегти в базу даних, але localStorage оновлено');
+    }
+
+    return content;
+  } catch (error) {
+    console.error('❌ Помилка імпорту бази даних:', error);
+    if (error instanceof SyntaxError) {
+      throw new Error('Невірний формат JSON файлу');
+    }
+    throw error;
+  }
+};
+
 // Функция для принудительной синхронизации с базой данных
 export const forceSyncWithDatabase = async (): Promise<boolean> => {
   try {

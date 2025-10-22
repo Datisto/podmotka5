@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { X, Plus, Trash2, Eye, EyeOff, Save, Upload, Download, RotateCcw, Settings, Palette, Type, Image, Video, Link, ChevronUp, ChevronDown, Edit3, LogOut, AlignLeft, AlignCenter, AlignRight, Bold, Italic, Underline } from 'lucide-react';
+import { X, Plus, Trash2, Eye, EyeOff, Save, Upload, Download, RotateCcw, Settings, Palette, Type, Image, Video, Link, ChevronUp, ChevronDown, Edit3, LogOut, AlignLeft, AlignCenter, AlignRight, Bold, Italic, Underline, Database, FileDown, FileUp } from 'lucide-react';
 import { ContentBlock, SiteContent, TextStyle, ContentImage } from '../../types/content';
 import { defaultContent } from '../../data/defaultContent';
 import { logout } from '../../utils/auth';
 import { loadBackgroundsFromDatabase } from '../../utils/supabase';
+import { exportDatabaseBackup, importDatabaseBackup } from '../../utils/contentStorage';
 import TextEditor from './TextEditor';
 
 interface AdminPanelProps {
@@ -507,6 +508,68 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose, content, onCon
               <X className="w-6 h-6 text-gray-400" />
             </button>
           </div>
+        </div>
+
+        {/* Database Backup Controls */}
+        <div className="px-6 py-4 border-b border-gray-700 bg-gray-800/50">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Database className="w-5 h-5 text-blue-400" />
+              <span className="text-white font-medium">Управління базою даних</span>
+            </div>
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={async () => {
+                  try {
+                    await exportDatabaseBackup();
+                    alert('Бекап успішно завантажено!');
+                  } catch (error) {
+                    alert('Помилка створення бекапу: ' + (error as Error).message);
+                  }
+                }}
+                className="flex items-center px-4 py-2 bg-green-600 hover:bg-green-500 text-white text-sm font-medium rounded-lg transition-colors"
+                title="Завантажити бекап бази даних"
+              >
+                <FileDown className="w-4 h-4 mr-2" />
+                Експорт БД
+              </button>
+              <label className="flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors cursor-pointer">
+                <FileUp className="w-4 h-4 mr-2" />
+                Імпорт БД
+                <input
+                  type="file"
+                  accept=".json"
+                  className="hidden"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+
+                    if (!confirm('УВАГА! Це замінить всю поточну базу даних. Продовжити?')) {
+                      e.target.value = '';
+                      return;
+                    }
+
+                    try {
+                      const newContent = await importDatabaseBackup(file);
+                      onContentChange(newContent);
+                      alert('База даних успішно імпортована! Оновіть сторінку для застосування змін.');
+                      // Перезавантажуємо сторінку для застосування змін
+                      setTimeout(() => {
+                        window.location.reload();
+                      }, 1000);
+                    } catch (error) {
+                      alert('Помилка імпорту: ' + (error as Error).message);
+                    } finally {
+                      e.target.value = '';
+                    }
+                  }}
+                />
+              </label>
+            </div>
+          </div>
+          <p className="text-xs text-gray-400 mt-2">
+            Експорт: завантажує JSON файл з усім контентом. Імпорт: замінює всю базу даних даними з файлу.
+          </p>
         </div>
 
         {/* Tabs */}
