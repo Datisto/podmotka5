@@ -10,15 +10,16 @@ export const loadContentSync = (): SiteContent => {
     const stored = localStorage.getItem(CONTENT_STORAGE_KEY);
     if (stored) {
       const parsed = JSON.parse(stored);
-      return {
-        ...defaultContent,
-        ...parsed,
-        seo: parsed.seo || defaultContent.seo
-      };
+      console.log('📦 Loading from localStorage:', {
+        blocksCount: parsed.blocks?.length,
+        heroTitle: parsed.blocks?.[0]?.title
+      });
+      return parsed;
     }
   } catch (error) {
     console.error('Error loading content from localStorage:', error);
   }
+  console.log('⚠️ No localStorage data, using defaults');
   return defaultContent;
 };
 
@@ -46,11 +47,11 @@ export const loadContent = async (): Promise<SiteContent> => {
     if (data && data.content) {
       const content = typeof data.content === 'string' ? JSON.parse(data.content) : data.content;
       localStorage.setItem(CONTENT_STORAGE_KEY, JSON.stringify(content));
-      return {
-        ...defaultContent,
-        ...content,
-        seo: content.seo || defaultContent.seo
-      };
+      console.log('✅ Loaded content from Supabase:', {
+        blocksCount: content.blocks?.length,
+        heroTitle: content.blocks?.[0]?.title
+      });
+      return content;
     }
 
     return loadContentSync();
