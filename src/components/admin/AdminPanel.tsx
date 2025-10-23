@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Plus, Trash2, Eye, EyeOff, Save, Upload, Download, RotateCcw, Settings, Palette, Type, Image, Video, Link, ChevronUp, ChevronDown, Edit3, LogOut, AlignLeft, AlignCenter, AlignRight, Bold, Italic, Underline, Database, FileDown, FileUp, Globe } from 'lucide-react';
+import { X, Plus, Trash2, Eye, EyeOff, Save, Upload, Download, RotateCcw, Settings, Palette, Type, Image, Video, Link, ChevronUp, ChevronDown, Edit3, LogOut, AlignLeft, AlignCenter, AlignRight, Bold, Italic, Underline, Database, FileDown, FileUp, Globe, Copy, Check } from 'lucide-react';
 import { ContentBlock, SiteContent, TextStyle, ContentImage } from '../../types/content';
 import { defaultContent } from '../../data/defaultContent';
 import { logout } from '../../utils/auth';
@@ -23,6 +23,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose, content, onCon
   const [imageUrlInput, setImageUrlInput] = useState('');
   const [dataSource, setDataSource] = useState<'supabase' | 'localStorage' | 'default' | 'unknown'>('unknown');
   const [showHistory, setShowHistory] = useState(false);
+  const [copiedLinkId, setCopiedLinkId] = useState<string | null>(null);
   const [textEditor, setTextEditor] = useState<{
     value: string;
     onChange: (value: string) => void;
@@ -431,6 +432,23 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose, content, onCon
     logout();
     onClose();
     window.location.reload();
+  };
+
+  const copyLinkToClipboard = async (blockId: string, navItemId: string) => {
+    try {
+      const currentUrl = window.location.origin + window.location.pathname;
+      const anchorLink = `${currentUrl}#${blockId}`;
+
+      await navigator.clipboard.writeText(anchorLink);
+
+      setCopiedLinkId(navItemId);
+      setTimeout(() => {
+        setCopiedLinkId(null);
+      }, 2000);
+    } catch (error) {
+      console.error('Помилка копіювання посилання:', error);
+      alert('Не вдалося скопіювати посилання');
+    }
   };
 
   const addVideo = (blockId: string) => {
@@ -1688,7 +1706,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose, content, onCon
               <div className="space-y-4">
                 {content.navigation.items.map((item) => (
                   <div key={item.id} className="bg-gray-800/50 rounded-lg p-4">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-3">
                       <div className="flex-1">
                         <input
                           type="text"
@@ -1711,6 +1729,21 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose, content, onCon
                         />
                       </div>
                       <button
+                        onClick={() => copyLinkToClipboard(item.blockId, item.id)}
+                        className={`p-2 rounded transition-all ${
+                          copiedLinkId === item.id
+                            ? 'bg-green-600 text-white'
+                            : 'hover:bg-gray-700 text-blue-400 hover:text-blue-300'
+                        }`}
+                        title="Копіювати посилання на секцію"
+                      >
+                        {copiedLinkId === item.id ? (
+                          <Check className="w-5 h-5" />
+                        ) : (
+                          <Copy className="w-5 h-5" />
+                        )}
+                      </button>
+                      <button
                         onClick={() => {
                           const updatedContent = {
                             ...content,
@@ -1725,7 +1758,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose, content, onCon
                           };
                           onContentChange(updatedContent);
                         }}
-                        className="ml-4 p-2 hover:bg-gray-700 rounded"
+                        className="p-2 hover:bg-gray-700 rounded"
                       >
                         {item.isVisible ? (
                           <Eye className="w-5 h-5 text-green-400" />

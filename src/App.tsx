@@ -376,7 +376,7 @@ function App() {
   // Check admin session on component mount
   useEffect(() => {
     setIsAuthenticated(checkAdminSession());
-    
+
     // Слушаем события сохранения контента
     const handleContentSaved = (event: CustomEvent) => {
       const { success, error } = event.detail;
@@ -390,12 +390,22 @@ function App() {
         setTimeout(() => setSaveStatus('idle'), 5000);
       }
     };
-    
+
     window.addEventListener('contentSaved', handleContentSaved as EventListener);
-    
+
     return () => {
       window.removeEventListener('contentSaved', handleContentSaved as EventListener);
     };
+  }, []);
+
+  // Handle direct navigation via URL hash
+  useEffect(() => {
+    const hash = window.location.hash.slice(1);
+    if (hash) {
+      setTimeout(() => {
+        scrollToSection(hash, false);
+      }, 300);
+    }
   }, []);
 
   const handleContentChange = async (newContent: SiteContent) => {
@@ -405,10 +415,13 @@ function App() {
     setContent(newContent);
   };
 
-  const scrollToSection = (sectionId: string) => {
+  const scrollToSection = (sectionId: string, updateUrl: boolean = true) => {
     const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
+      if (updateUrl) {
+        window.history.pushState(null, '', `#${sectionId}`);
+      }
     }
   };
 
@@ -569,13 +582,17 @@ function App() {
               {/* Desktop Navigation */}
               <nav className="hidden md:flex items-center space-x-4">
                 {visibleNavItems.map((item) => (
-                  <button
+                  <a
                     key={item.id}
-                    onClick={() => scrollToSection(item.blockId)}
+                    href={`#${item.blockId}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      scrollToSection(item.blockId);
+                    }}
                     className="px-3 py-1 text-sm text-white hover:text-yellow-400 transition-colors font-medium"
                   >
                     {item.title}
-                  </button>
+                  </a>
                 ))}
               </nav>
 
@@ -617,16 +634,18 @@ function App() {
         <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-40 md:hidden">
           <div className="flex flex-col items-center justify-center h-full space-y-6">
             {visibleNavItems.map((item) => (
-              <button
+              <a
                 key={item.id}
-                onClick={() => {
+                href={`#${item.blockId}`}
+                onClick={(e) => {
+                  e.preventDefault();
                   scrollToSection(item.blockId);
                   setIsMobileMenuOpen(false);
                 }}
                 className="text-2xl text-white hover:text-yellow-400 transition-colors font-medium"
               >
                 {item.title}
-              </button>
+              </a>
             ))}
           </div>
         </div>
