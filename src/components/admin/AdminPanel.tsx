@@ -3,7 +3,7 @@ import { X, Plus, Trash2, Eye, EyeOff, Save, Upload, Download, RotateCcw, Settin
 import { ContentBlock, SiteContent, TextStyle, ContentImage } from '../../types/content';
 import { defaultContent } from '../../data/defaultContent';
 import { logout } from '../../utils/auth';
-import { exportDatabaseBackup, importDatabaseBackup } from '../../utils/contentStorage';
+import { exportDatabaseBackup, importDatabaseBackup, getDataSource, getContentHistory, restoreFromHistory } from '../../utils/contentStorage';
 import { getDefaultSEO } from '../../utils/seo';
 import TextEditor from './TextEditor';
 import SEOEditor from './SEOEditor';
@@ -21,6 +21,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose, content, onCon
   const [draggedBlock, setDraggedBlock] = useState<string | null>(null);
   const [backgroundImages, setBackgroundImages] = useState<Array<{id: string, name: string, css_value: string, preview_color: string}>>([]);
   const [imageUrlInput, setImageUrlInput] = useState('');
+  const [dataSource, setDataSource] = useState<'supabase' | 'localStorage' | 'default' | 'unknown'>('unknown');
+  const [showHistory, setShowHistory] = useState(false);
   const [textEditor, setTextEditor] = useState<{
     value: string;
     onChange: (value: string) => void;
@@ -29,6 +31,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose, content, onCon
     placeholder?: string;
     rows?: number;
   } | null>(null);
+
+  useEffect(() => {
+    setDataSource(getDataSource());
+  }, [content]);
 
   useEffect(() => {
     const specificBackgrounds = [
@@ -506,6 +512,71 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose, content, onCon
           </div>
         </div>
 
+        {/* Data Source Indicator */}
+        <div className="px-6 py-3 border-b border-gray-700 bg-gray-800/30">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className={`w-3 h-3 rounded-full ${
+                dataSource === 'supabase' ? 'bg-green-500' :
+                dataSource === 'localStorage' ? 'bg-yellow-500' :
+                dataSource === 'default' ? 'bg-red-500' : 'bg-gray-500'
+              }`} />
+              <span className="text-sm text-gray-300">
+                Джерело даних: <span className="font-medium text-white">
+                  {dataSource === 'supabase' ? 'Supabase (синхронізовано)' :
+                   dataSource === 'localStorage' ? 'LocalStorage (тільки локально)' :
+                   dataSource === 'default' ? 'Дефолтні налаштування' : 'Невідомо'}
+                </span>
+              </span>
+            </div>
+            <button
+              onClick={() => setShowHistory(!showHistory)}
+              className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
+            >
+              {showHistory ? 'Приховати історію' : 'Показати історію змін'}
+            </button>
+          </div>
+          {showHistory && (
+            <div className="mt-3 p-3 bg-gray-900/50 rounded-lg">
+              <h4 className="text-sm font-medium text-white mb-2">Історія останніх змін:</h4>
+              {(() => {
+                const history = getContentHistory();
+                if (history.length === 0) {
+                  return <p className="text-xs text-gray-400">Історія порожня</p>;
+                }
+                return (
+                  <div className="space-y-2">
+                    {history.map((entry, index) => (
+                      <div key={index} className="flex items-center justify-between p-2 bg-gray-800/50 rounded">
+                        <div className="flex-1">
+                          <p className="text-xs text-gray-300">
+                            {new Date(entry.timestamp).toLocaleString('uk-UA')}
+                          </p>
+                          <p className="text-xs text-gray-400">Джерело: {entry.source}</p>
+                        </div>
+                        <button
+                          onClick={async () => {
+                            if (confirm('Відновити цю версію?')) {
+                              const restored = restoreFromHistory(index);
+                              if (restored) {
+                                onContentChange(restored);
+                                alert('Версію відновлено!');
+                              }
+                            }
+                          }}
+                          className="px-2 py-1 bg-blue-600 hover:bg-blue-500 text-white text-xs rounded transition-colors"
+                        >
+                          Відновити
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
+            </div>
+          )}
+        </div>
+
         {/* Database Backup Controls */}
         <div className="px-6 py-4 border-b border-gray-700 bg-gray-800/50">
           <div className="flex items-center justify-between">
@@ -562,7 +633,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose, content, onCon
             </div>
           </div>
           <p className="text-xs text-gray-400 mt-2">
-            Експорт: завантажує JSON файл з усім контентом. Імпорт: замінює всю базу даних даними з файлу.
+            Експорт: завантажує JSON файл з усім контентом та метаданими. Імпорт: автоматично створює бекап перед заміною.
           </p>
         </div>
 
