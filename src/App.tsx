@@ -4,7 +4,7 @@ import AdminPanel from './components/admin/AdminPanel';
 import LoginForm from './components/admin/LoginForm';
 import DynamicContent from './components/DynamicContent';
 import { SiteContent } from './types/content';
-import { loadContentSync, saveContent, loadContent } from './utils/contentStorage';
+import { loadContentSync, saveContent, loadContent, saveContentDebounced } from './utils/contentStorage';
 import { checkAdminSession } from './utils/auth';
 import { updateMetaTags, generateStructuredData, getDefaultSEO } from './utils/seo';
 
@@ -363,9 +363,9 @@ function App() {
     generateStructuredData(seoSettings);
   }, [content]);
   
-  // Save content to localStorage when it changes
+  // Save content with debounce when it changes
   useEffect(() => {
-    saveContent(content).catch(console.error);
+    saveContentDebounced(content);
   }, [content]);
 
   // Check admin session on component mount
@@ -398,7 +398,6 @@ function App() {
     setSaveStatus('saving');
     setSaveMessage('Збереження...');
     setContent(newContent);
-    await saveContent(newContent);
   };
 
   const scrollToSection = (sectionId: string) => {

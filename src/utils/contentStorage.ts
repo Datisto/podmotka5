@@ -60,7 +60,7 @@ export const loadContent = async (): Promise<SiteContent> => {
   }
 };
 
-let saveContentTimer: NodeJS.Timeout | null = null;
+let saveContentTimer: number | null = null;
 
 export const saveContent = async (content: SiteContent): Promise<void> => {
   try {
