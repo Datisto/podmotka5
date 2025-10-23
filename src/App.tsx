@@ -258,6 +258,7 @@ const FeatureIcon: React.FC<{
 
 function App() {
   const [content, setContent] = useState<SiteContent>(loadContentSync());
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
   
   // Функция для получения стилей текста из блока
   const getTextStyleClasses = (blockId: string, styleType: 'title' | 'subtitle' | 'description' | 'content'): string => {
@@ -348,8 +349,10 @@ function App() {
       try {
         const latestContent = await loadContent();
         setContent(latestContent);
+        setIsInitialLoad(false);
       } catch (error) {
         console.error('Error loading latest content:', error);
+        setIsInitialLoad(false);
       }
     };
 
@@ -363,10 +366,12 @@ function App() {
     generateStructuredData(seoSettings);
   }, [content]);
   
-  // Save content with debounce when it changes
+  // Save content with debounce when it changes (skip initial load)
   useEffect(() => {
-    saveContentDebounced(content);
-  }, [content]);
+    if (!isInitialLoad) {
+      saveContentDebounced(content);
+    }
+  }, [content, isInitialLoad]);
 
   // Check admin session on component mount
   useEffect(() => {
